@@ -1,0 +1,36 @@
+{
+  "name": "@ogugu9/typespec-route-linter",
+  "version": "1.0.0",
+  "description": "TypeSpec linter to prevent nested @route decorators",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts"
+  },
+  "peerDependencies": {
+    "@typespec/compiler": "^0.50.0"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "^0.50.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0"
+  },
+  "typespec": {
+    "linter": true
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "keywords": [
+    "typespec",
+    "linter",
+    "route",
+    "api"
+  ]
+}
