@@ -5,6 +5,9 @@ import { noNestedRouteRule } from "../src/rules/no-nested-route.rule.js";
 describe("no-nested-route rule", () => {
   it("should report error for nested @route in namespace", async () => {
     const testCode = `
+      import "@typespec/rest";
+      using TypeSpec.Rest;
+      
       @route("/api/v1/pets")
       namespace Pets {
         @route("/list")
@@ -22,6 +25,9 @@ describe("no-nested-route rule", () => {
 
   it("should report error for multiple nested routes in namespace", async () => {
     const testCode = `
+      import "@typespec/rest";
+      using TypeSpec.Rest;
+      
       @route("/api/v1/store")
       namespace Store {
         @route("/inventory")
@@ -44,6 +50,9 @@ describe("no-nested-route rule", () => {
 
   it("should report error for nested @route in interface", async () => {
     const testCode = `
+      import "@typespec/rest";
+      using TypeSpec.Rest;
+      
       @route("/api/v1/users")
       interface Users {
         @route("/profile")
@@ -61,6 +70,9 @@ describe("no-nested-route rule", () => {
 
   it("should not report error for non-nested @route", async () => {
     const testCode = `
+      import "@typespec/rest";
+      using TypeSpec.Rest;
+      
       @route("/api/v1/pets")
       interface Pets {
         @get list(): Pet[];
@@ -80,6 +92,9 @@ describe("no-nested-route rule", () => {
 
   it("should not report error for operations without @route in @route namespace", async () => {
     const testCode = `
+      import "@typespec/rest";
+      using TypeSpec.Rest;
+      
       @route("/api/v1/pets")
       namespace Pets {
         @get
@@ -98,6 +113,9 @@ describe("no-nested-route rule", () => {
 
   it("should handle deeply nested structures correctly", async () => {
     const testCode = `
+      import "@typespec/rest";
+      using TypeSpec.Rest;
+      
       @route("/api/v1")
       namespace PetStore {
         @route("/pets")
@@ -119,6 +137,9 @@ describe("no-nested-route rule", () => {
 
   it("should not report error for sibling namespaces with @route", async () => {
     const testCode = `
+      import "@typespec/rest";
+      using TypeSpec.Rest;
+      
       namespace PetStoreAPI {
         @route("/pets")
         namespace Pets {
