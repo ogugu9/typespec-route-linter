@@ -12,7 +12,7 @@ export const noNestedRouteRule = createRule({
     function hasRouteDecorator(node: Interface | Namespace | Operation): boolean {
       if (!node.decorators) return false;
       return node.decorators.some((decorator: DecoratorApplication) => {
-        return decorator.decorator.name === '$route';
+        return decorator?.decorator?.name === '$route';
       });
     }
 
