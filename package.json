@@ -1,6 +1,6 @@
 {
   "name": "@ogugu9/typespec-route-linter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "TypeSpec linter to prevent nested @route decorators",
   "type": "module",
   "main": "dist/index.js",
