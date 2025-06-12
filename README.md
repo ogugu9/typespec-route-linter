@@ -50,7 +50,7 @@ op getPetInStore(@path storeId: string, @path petId: string): Pet; // Clear path
 ## Installation
 
 ```bash
-npm install @ogugu9/typespec-route-linter
+npm install -D @ogugu9/typespec-route-linter
 ```
 
 ## Usage
