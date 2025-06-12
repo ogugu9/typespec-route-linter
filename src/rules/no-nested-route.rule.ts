@@ -9,21 +9,57 @@ export const noNestedRouteRule = createRule({
     default: paramMessage`Nested @route decorators are not allowed. This @route is nested within another @route decorator.`,
   },
   create: (context) => {
-    function hasRouteDecorator(node: any): boolean {
-      return node.decorators?.some((decorator: DecoratorApplication) => {
-        return decorator.decorator.name === "$route" || 
-               (decorator.decorator.namespace === "TypeSpec.Rest" && decorator.decorator.name === "route");
-      }) ?? false;
+    function hasRouteDecorator(node: Interface | Namespace | Operation): boolean {
+      if (!node.decorators) return false;
+      return node.decorators.some((decorator: DecoratorApplication) => {
+        return decorator.decorator.name === '$route';
+      });
     }
 
-    function findParentWithRoute(node: any): any | null {
-      let current = node.parent;
-      while (current) {
-        if (hasRouteDecorator(current)) {
-          return current;
+    function isRouteableNode(node: unknown): node is Interface | Namespace | Operation {
+      return (
+        typeof node === 'object' &&
+        node !== null &&
+        'kind' in node &&
+        (node.kind === "Interface" || node.kind === "Namespace" || node.kind === "Operation")
+      );
+    }
+
+    function findParentWithRoute(node: Interface | Namespace | Operation): Interface | Namespace | Operation | null {
+      if (node.kind === "Interface") {
+        if (node.namespace) {
+          if (hasRouteDecorator(node.namespace)) {
+            return node.namespace;
+          }
+          return findParentWithRoute(node.namespace);
         }
-        current = current.parent;
       }
+      
+      if (node.kind === "Operation") {
+        if (node.interface) {
+          if (hasRouteDecorator(node.interface)) {
+            return node.interface;
+          }
+          const interfaceParent = findParentWithRoute(node.interface);
+          if (interfaceParent) return interfaceParent;
+        }
+        if (node.namespace) {
+          if (hasRouteDecorator(node.namespace)) {
+            return node.namespace;
+          }
+          return findParentWithRoute(node.namespace);
+        }
+      }
+      
+      if (node.kind === "Namespace") {
+        if (node.namespace) {
+          if (hasRouteDecorator(node.namespace)) {
+            return node.namespace;
+          }
+          return findParentWithRoute(node.namespace);
+        }
+      }
+      
       return null;
     }
 

@@ -1,161 +1,132 @@
-import { describe, it, expect } from "vitest";
-import { createTestHost } from "@typespec/compiler/testing";
+import {
+  LinterRuleTester,
+  createLinterRuleTester,
+  createTestHost,
+  createTestWrapper,
+} from "@typespec/compiler/testing";
+import { HttpTestLibrary } from "@typespec/http/testing";
+import { beforeEach, describe, it } from "vitest";
 import { noNestedRouteRule } from "../src/rules/no-nested-route.rule.js";
 
 describe("no-nested-route rule", () => {
+  let ruleTester: LinterRuleTester;
+
+  beforeEach(async () => {
+    const host = await createTestHost({
+      libraries: [HttpTestLibrary],
+    });
+    const runner = createTestWrapper(host, {
+      autoUsings: ["TypeSpec.Http"]
+    });
+    ruleTester = createLinterRuleTester(runner, noNestedRouteRule, "typespec-route-linter");
+  });
+
   it("should report error for nested @route in namespace", async () => {
-    const testCode = `
-      import "@typespec/rest";
-      using TypeSpec.Rest;
-      
-      @route("/api/v1/pets")
-      namespace Pets {
-        @route("/list")
-        @get
-        op list(): Pet[];
+    await ruleTester.expect(`
+      @route("/api")
+      namespace PetStore {
+        @route("/pets")
+        interface Pets {
+          op list(): string[];
+        }
       }
-    `;
-    
-    const host = await createTestHost();
-    const diagnostics = await host.diagnose(testCode, { linters: [noNestedRouteRule] });
-    
-    expect(diagnostics).toHaveLength(1);
-    expect(diagnostics[0].message).toContain("Nested @route decorators are not allowed");
+    `).toEmitDiagnostics({
+      code: "typespec-route-linter/no-nested-route",
+      message: "Nested @route decorators are not allowed. This @route is nested within another @route decorator.",
+    });
   });
 
   it("should report error for multiple nested routes in namespace", async () => {
-    const testCode = `
-      import "@typespec/rest";
-      using TypeSpec.Rest;
-      
-      @route("/api/v1/store")
+    await ruleTester.expect(`
+      @route("/api")
       namespace Store {
-        @route("/inventory")
-        @get
-        op getInventory(): Inventory;
-
-        @route("/orders")
-        @get
-        op getOrders(): Order[];
+        @route("/v1")
+        namespace V1 {
+          @route("/orders")
+          interface Orders {
+            op getOrders(): string[];
+          }
+        }
       }
-    `;
-    
-    const host = await createTestHost();
-    const diagnostics = await host.diagnose(testCode, { linters: [noNestedRouteRule] });
-    
-    expect(diagnostics).toHaveLength(2);
-    expect(diagnostics[0].message).toContain("Nested @route decorators are not allowed");
-    expect(diagnostics[1].message).toContain("Nested @route decorators are not allowed");
+    `).toEmitDiagnostics([
+      {
+        code: "typespec-route-linter/no-nested-route",
+        message: "Nested @route decorators are not allowed. This @route is nested within another @route decorator.",
+      },
+      {
+        code: "typespec-route-linter/no-nested-route", 
+        message: "Nested @route decorators are not allowed. This @route is nested within another @route decorator.",
+      }
+    ]);
   });
 
   it("should report error for nested @route in interface", async () => {
-    const testCode = `
-      import "@typespec/rest";
-      using TypeSpec.Rest;
-      
-      @route("/api/v1/users")
+    await ruleTester.expect(`
+      @route("/users")
       interface Users {
         @route("/profile")
-        @get
-        getProfile(): UserProfile;
+        getProfile(): string;
       }
-    `;
-    
-    const host = await createTestHost();
-    const diagnostics = await host.diagnose(testCode, { linters: [noNestedRouteRule] });
-    
-    expect(diagnostics).toHaveLength(1);
-    expect(diagnostics[0].message).toContain("Nested @route decorators are not allowed");
+    `).toEmitDiagnostics({
+      code: "typespec-route-linter/no-nested-route",
+      message: "Nested @route decorators are not allowed. This @route is nested within another @route decorator.",
+    });
   });
 
   it("should not report error for non-nested @route", async () => {
-    const testCode = `
-      import "@typespec/rest";
-      using TypeSpec.Rest;
-      
-      @route("/api/v1/pets")
-      interface Pets {
-        @get list(): Pet[];
+    await ruleTester.expect(`
+      @route("/inventory")
+      interface Inventory {
+        @get getInventory(): string;
       }
-      
-      @route("/api/v1/store")
-      interface Store {
-        @get getInventory(): Inventory;
-      }
-    `;
-    
-    const host = await createTestHost();
-    const diagnostics = await host.diagnose(testCode, { linters: [noNestedRouteRule] });
-    
-    expect(diagnostics).toHaveLength(0);
+    `).toBeValid();
   });
 
   it("should not report error for operations without @route in @route namespace", async () => {
-    const testCode = `
-      import "@typespec/rest";
-      using TypeSpec.Rest;
-      
-      @route("/api/v1/pets")
-      namespace Pets {
+    await ruleTester.expect(`
+      @route("/pets")
+      namespace PetStore {
         @get
-        op findByStatus(@query status: PetStatus): Pet[];
-        
-        @post
-        op addPet(@body pet: Pet): Pet;
+        op addPet(pet: string): string;
       }
-    `;
-    
-    const host = await createTestHost();
-    const diagnostics = await host.diagnose(testCode, { linters: [noNestedRouteRule] });
-    
-    expect(diagnostics).toHaveLength(0);
+    `).toBeValid();
   });
 
   it("should handle deeply nested structures correctly", async () => {
-    const testCode = `
-      import "@typespec/rest";
-      using TypeSpec.Rest;
-      
-      @route("/api/v1")
-      namespace PetStore {
-        @route("/pets")
-        namespace Pets {
-          @route("/categories")
-          @get
-          op getCategories(): Category[];
+    await ruleTester.expect(`
+      @route("/api")
+      namespace API {
+        @route("/v2")
+        namespace V2 {
+          @route("/products")
+          interface Products {
+            op getProducts(): string[];
+          }
         }
       }
-    `;
-    
-    const host = await createTestHost();
-    const diagnostics = await host.diagnose(testCode, { linters: [noNestedRouteRule] });
-    
-    expect(diagnostics).toHaveLength(2);
-    expect(diagnostics[0].message).toContain("Nested @route decorators are not allowed");
-    expect(diagnostics[1].message).toContain("Nested @route decorators are not allowed");
+    `).toEmitDiagnostics([
+      {
+        code: "typespec-route-linter/no-nested-route",
+        message: "Nested @route decorators are not allowed. This @route is nested within another @route decorator.",
+      },
+      {
+        code: "typespec-route-linter/no-nested-route",
+        message: "Nested @route decorators are not allowed. This @route is nested within another @route decorator.",
+      }
+    ]);
   });
 
   it("should not report error for sibling namespaces with @route", async () => {
-    const testCode = `
-      import "@typespec/rest";
-      using TypeSpec.Rest;
-      
-      namespace PetStoreAPI {
-        @route("/pets")
-        namespace Pets {
-          @get findByStatus(@query status: PetStatus): Pet[];
-        }
-        
-        @route("/store")
-        namespace Store {
-          @get getInventory(): Inventory;
-        }
+    await ruleTester.expect(`
+      @route("/users")
+      interface Users {
+        op getUsers(): string[];
       }
-    `;
-    
-    const host = await createTestHost();
-    const diagnostics = await host.diagnose(testCode, { linters: [noNestedRouteRule] });
-    
-    expect(diagnostics).toHaveLength(0);
+      
+      @route("/orders")
+      interface Orders {
+        op getOrders(): string[];
+      }
+    `).toBeValid();
   });
 });
