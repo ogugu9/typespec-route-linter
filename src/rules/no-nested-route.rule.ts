@@ -1,5 +1,5 @@
 import { createRule, paramMessage } from "@typespec/compiler";
-import type { Decorator, Interface, Namespace, Operation } from "@typespec/compiler";
+import type { DecoratorApplication, Interface, Namespace, Operation } from "@typespec/compiler";
 
 export const noNestedRouteRule = createRule({
   name: "no-nested-route",
@@ -10,9 +10,10 @@ export const noNestedRouteRule = createRule({
   },
   create: (context) => {
     function hasRouteDecorator(node: any): boolean {
-      return node.decorators?.some((decorator: Decorator) => 
-        decorator.name === "@route"
-      ) ?? false;
+      return node.decorators?.some((decorator: DecoratorApplication) => {
+        return decorator.decorator.name === "$route" || 
+               (decorator.decorator.namespace === "TypeSpec.Rest" && decorator.decorator.name === "route");
+      }) ?? false;
     }
 
     function findParentWithRoute(node: any): any | null {
