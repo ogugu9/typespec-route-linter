@@ -1,7 +1,16 @@
 {
   "name": "@ogugu9/typespec-route-linter",
   "version": "1.1.0",
+  "author": "ogugu9<e.cos.isin@gmail.com>",
   "description": "TypeSpec linter to prevent nested @route decorators",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ogugu9/typespec-route-linter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ogugu9/typespec-route-linter/issues"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
