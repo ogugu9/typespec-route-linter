@@ -11,15 +11,15 @@
     "lint": "eslint src --ext .ts"
   },
   "peerDependencies": {
-    "@typespec/compiler": "^0.50.0"
+    "@typespec/compiler": "^1.1.0"
   },
   "devDependencies": {
-    "@typespec/compiler": "^0.50.0",
+    "@typespec/compiler": "^1.1.0",
     "typescript": "^5.0.0",
-    "vitest": "^1.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.0.0"
+    "vitest": "^3.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
+    "eslint": "^9.28.0"
   },
   "typespec": {
     "linter": true
