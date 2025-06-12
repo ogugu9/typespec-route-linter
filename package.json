@@ -26,12 +26,15 @@
     "@typespec/compiler": "^1.1.0"
   },
   "devDependencies": {
-    "@typespec/compiler": "^1.1.0",
-    "typescript": "^5.0.0",
-    "vitest": "^3.2.3",
+    "@types/node": "^24.0.1",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",
-    "eslint": "^9.28.0"
+    "@typespec/compiler": "^1.1.0",
+    "@typespec/http": "^1.1.0",
+    "@typespec/rest": "^0.71.0",
+    "eslint": "^9.28.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.3"
   },
   "typespec": {
     "linter": true
