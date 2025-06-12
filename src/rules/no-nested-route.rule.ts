@@ -16,15 +16,6 @@ export const noNestedRouteRule = createRule({
       });
     }
 
-    function isRouteableNode(node: unknown): node is Interface | Namespace | Operation {
-      return (
-        typeof node === 'object' &&
-        node !== null &&
-        'kind' in node &&
-        (node.kind === "Interface" || node.kind === "Namespace" || node.kind === "Operation")
-      );
-    }
-
     function findParentWithRoute(node: Interface | Namespace | Operation): Interface | Namespace | Operation | null {
       if (node.kind === "Interface") {
         if (node.namespace) {

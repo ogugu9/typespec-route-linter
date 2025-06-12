@@ -61,21 +61,15 @@ Add the linter to your `tspconfig.yaml`:
 
 ```yaml
 linter:
-  extends:
-    - "typespec-route-linter"
-```
-
-### Command Line Usage
-
-```bash
-tsp compile . --linter typespec-route-linter
+  enable:
+    "typespec-route-linter/no-nested-route": true
 ```
 
 ## Rule Details
 
 ### `no-nested-route`
 
-**Severity**: Error
+**Severity**: Warning
 
 **Description**: Prevents `@route` decorators from being nested within other `@route` decorated elements.
 
