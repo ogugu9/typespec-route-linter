@@ -50,7 +50,7 @@ op getPetInStore(@path storeId: string, @path petId: string): Pet; // Clear path
 ## Installation
 
 ```bash
-npm install -D @ogugu9/typespec-route-linter
+npm install -D typespec-route-linter
 ```
 
 ## Usage
@@ -62,15 +62,13 @@ Add the linter to your `tspconfig.yaml`:
 ```yaml
 linter:
   extends:
-    - "@ogugu9/typespec-route-linter"
-  rules:
-    "@ogugu9/typespec-route-linter/no-nested-route": "error"
+    - "typespec-route-linter"
 ```
 
 ### Command Line Usage
 
 ```bash
-tsp compile . --linter @ogugu9/typespec-route-linter
+tsp compile . --linter typespec-route-linter
 ```
 
 ## Rule Details

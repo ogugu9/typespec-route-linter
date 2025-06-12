@@ -1,5 +1,5 @@
 {
-  "name": "@ogugu9/typespec-route-linter",
+  "name": "typespec-route-linter",
   "version": "1.1.0",
   "author": "ogugu9<e.cos.isin@gmail.com>",
   "description": "TypeSpec linter to prevent nested @route decorators",
