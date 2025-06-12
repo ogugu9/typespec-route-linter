@@ -9,29 +9,36 @@ export const noNestedRouteRule = createRule({
     default: paramMessage`Nested @route decorators are not allowed. This @route is nested within another @route decorator.`,
   },
   create: (context) => {
-    function hasRouteDecorator(node: any): boolean {
-      return node.decorators?.some((decorator: Decorator) => 
-        decorator.name === "@route"
-      ) ?? false;
+    function hasRouteDecorator(type: Interface | Namespace | Operation): boolean {
+      return type.decorators?.some((decorator: any) => {
+        const name = decorator.decorator?.name;
+        return name === "$route";
+      }) ?? false;
     }
 
-    function findParentWithRoute(node: any): any | null {
-      let current = node.parent;
+    function findParentWithRoute(type: Interface | Namespace | Operation): Interface | Namespace | Operation | null {
+      if (!type.node?.parent) return null;
+      
+      let current: any = type.node.parent;
       while (current) {
-        if (hasRouteDecorator(current)) {
-          return current;
+        const semanticType = context.program.checker.getTypeForNode(current);
+        if (semanticType && 
+            (semanticType.kind === "Interface" || semanticType.kind === "Namespace" || semanticType.kind === "Operation") &&
+            hasRouteDecorator(semanticType as any)) {
+          return semanticType as any;
         }
         current = current.parent;
       }
       return null;
     }
 
-    function checkForNestedRoute(node: Interface | Namespace | Operation) {
-      if (hasRouteDecorator(node)) {
-        const parentWithRoute = findParentWithRoute(node);
+    function checkForNestedRoute(type: Interface | Namespace | Operation) {
+      if (hasRouteDecorator(type)) {
+        const parentWithRoute = findParentWithRoute(type);
         if (parentWithRoute) {
           context.reportDiagnostic({
-            target: node,
+            target: type,
+            messageId: "default",
             format: {},
           });
         }
